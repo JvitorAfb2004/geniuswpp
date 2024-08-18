@@ -2,11 +2,7 @@
 const express = require('express');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-
-// Inicializar o cliente do WhatsApp
-const client = new Client({
-    authStrategy: new LocalAuth()
-});
+const puppeteer = require('puppeteer'); // Importar o Puppeteer
 
 // Inicializar o aplicativo Express
 const app = express();
@@ -14,6 +10,19 @@ const port = 3000;
 
 // Middleware para analisar o corpo das requisições em formato JSON
 app.use(express.json());
+
+// Caminho do executável do Chromium
+const chromiumExecutablePath = '/usr/bin/chromium'; // Atualize o caminho conforme necessário
+
+// Inicializar o cliente do WhatsApp
+const client = new Client({
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        executablePath: chromiumExecutablePath, // Definir o caminho do Chromium
+        headless: true, // Defina como true para rodar o Chromium em modo headless
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Adicionar argumentos necessários
+    }
+});
 
 // Gerar e exibir o QR Code para autenticação
 client.on('qr', (qr) => {
